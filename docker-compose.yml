@@ -1,0 +1,90 @@
+version: '3'
+
+services:
+  db:
+    container_name: boiler_mongodb
+    restart: always
+    image: mongo:5.0.2
+    env_file: ./backend/.sample.env
+    environment: 
+      # - MONGO_INITDB_ROOT_USERNAME=root
+      # - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=boiler_db
+        # - MONGODB_DATABASE="test"
+    # ports:
+    #   - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+    networks:
+      - core
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./backend/mongodb-data:/data/db
+  backend:
+    container_name: boiler_backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    env_file: ./backend/.sample.env
+    # environment:
+    #   - DB_HOST=localhost
+    #   - DB_USER=root
+    #   - DB_PASSWORD=123456
+    #   - DB_NAME=alpha_db
+    #   - DB_PORT=27017
+    command: 
+      # ["yarn", "run", "start", ":debug"]
+      yarn run start:debug
+    volumes:
+      - ./backend:/app/backend
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /app/backend/node_modules
+    ports:
+      - 5000:5000
+    # ports:
+    #   - 8000:8000
+    networks:
+      - core
+    links:
+      - db:db
+  webapp:
+    container_name: boiler_webapp
+    build:
+      context: webapp
+      dockerfile: Dockerfile
+    networks:
+      - core
+    command:
+      "yarn run dev"
+    volumes:
+      - ./webapp:/webapp
+      - /var/run/docker.sock:/var/run/docker.sock
+      - node-modules:/webapp/node_modules
+    ports:
+      - 3000:3000
+    links:
+      - backend:backend
+  nginx:
+    container_name: boiler_nginx
+    image: nginx
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    volumes:
+      - static:/app/backend/static
+    ports:
+      - 80:80
+    links: 
+      - backend
+      - webapp
+    networks:
+      - core
+    command: [nginx-debug, '-g', 'daemon off;']
+
+networks:
+  core:
+
+volumes:
+  node-modules:
+  static:
+  mongodb-data:
+    driver: local

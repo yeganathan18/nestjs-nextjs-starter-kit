@@ -35,7 +35,7 @@ backend/*.sublime-workspace
 !.vscode/extensions.json
 
 backend/.development.env
-
+backend/mongodb-data/
 
 # webapp
 

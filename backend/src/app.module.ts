@@ -13,11 +13,13 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.development.env',
+      envFilePath: '.sample.env',
     }),
-    MongooseModule.forRoot(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@test-cluster.9mejc.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`),
+    // MongooseModule.forRoot(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@test-cluster.9mejc.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`),,
+    MongooseModule.forRoot('mongodb://db:27017/alpha_db'),
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      path: '/api/graphql',
       sortSchema: true,
       playground: true,
       debug: false,
