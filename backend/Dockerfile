@@ -16,6 +16,6 @@ ADD . /app/backend
 
 COPY . /app/backend/
 
-EXPOSE 5000
+EXPOSE 8000
 
 # CMD ["yarn", "run", "start"]
